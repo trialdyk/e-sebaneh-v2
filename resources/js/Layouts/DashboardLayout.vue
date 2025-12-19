@@ -61,7 +61,12 @@ useFlashToast();
 const links = [[{
     label: 'Dashboard',
     icon: 'i-lucide-house',
-    to: '/dashboard'
+    to: '/dashboard',
+    exact: true
+}, {
+    label: 'Tahun Ajaran',
+    icon: 'i-lucide-calendar',
+    to: '/dashboard/school-years'
 }, {
     label: 'Posts',
     icon: 'i-lucide-file-text',

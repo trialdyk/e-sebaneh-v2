@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SchoolYearController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -63,12 +64,16 @@ Route::middleware('auth')->group(function () {
 
         // Admin routes
         Route::middleware('role:super-admin|admin-pondok')->group(function () {
+            // School Years
+            Route::resource('school-years', SchoolYearController::class)->except(['show', 'create', 'edit']);
+            Route::post('school-years/{school_year}/activate', [SchoolYearController::class, 'activate'])->name('school-years.activate');
+
             Route::get('/users', function () {
                 return Inertia::render('Dashboard/Users', [
                     'users' => \App\Models\User::with('roles')->latest()->paginate(10),
                 ]);
             })->name('dashboard.users');
-
+            
             Route::get('/posts', function () {
                 return Inertia::render('Dashboard/Posts', [
                     'posts' => [],
