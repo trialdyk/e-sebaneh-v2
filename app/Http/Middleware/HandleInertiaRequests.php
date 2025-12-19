@@ -37,7 +37,30 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
-            //
+
+            // Authenticated User
+            'auth' => [
+                'user' => $request->user() ? [
+                    'id' => $request->user()->id,
+                    'name' => $request->user()->name,
+                    'email' => $request->user()->email,
+                    'phone_number' => $request->user()->phone_number,
+                    'gender' => $request->user()->gender?->value,
+                    'gender_label' => $request->user()->gender_label,
+                    'balance' => $request->user()->balance,
+                    'formatted_balance' => $request->user()->formatted_balance,
+                    'profile_photo_url' => $request->user()->profile_photo_url,
+                    'has_google_linked' => $request->user()->hasGoogleLinked(),
+                    'roles' => $request->user()->getRoleNames(),
+                    'permissions' => $request->user()->getAllPermissions()->pluck('name'),
+                ] : null,
+            ],
+
+            // Flash Messages
+            'flash' => [
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
+            ],
         ];
     }
 }

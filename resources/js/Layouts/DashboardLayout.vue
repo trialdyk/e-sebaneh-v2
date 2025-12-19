@@ -1,5 +1,5 @@
 <template>
-    <UApp>
+    <UApp :toaster="{position: 'top-right'}">
         <UDashboardGroup unit="rem" storage="local">
             <UDashboardSidebar
                 id="default"
@@ -50,9 +50,13 @@ import { computed, ref } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import TeamsMenu from '@/Components/TeamsMenu.vue';
 import UserMenu from '@/Components/UserMenu.vue';
+import { useFlashToast } from '@/composables/useFlashToast';
 
 const page = usePage();
 const open = ref(false);
+
+// Initialize flash toast - akan auto show toast dari server flash messages
+useFlashToast();
 
 const links = [[{
     label: 'Dashboard',

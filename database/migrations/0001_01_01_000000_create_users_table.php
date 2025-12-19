@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\GenderEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,7 +17,14 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
+            $table->string('phone_number')->nullable();
             $table->string('password');
+            $table->enum('gender', [GenderEnum::MALE->value, GenderEnum::FEMALE->value])->nullable();
+            $table->string('pin_atm')->nullable();
+            $table->bigInteger('balance')->default(0);
+            $table->string('profile_photo')->nullable();
+            $table->string('google_id')->nullable()->unique();
+            $table->text('google_token')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
