@@ -90,7 +90,7 @@ class User extends Authenticatable
      */
     public function hasGoogleLinked(): bool
     {
-        return !empty($this->google_id);
+        return ! empty($this->google_id);
     }
 
     /**
@@ -98,7 +98,18 @@ class User extends Authenticatable
      */
     public function getFormattedBalanceAttribute(): string
     {
-        return 'Rp ' . number_format($this->balance, 0, ',', '.');
+        return 'Rp '.number_format($this->balance, 0, ',', '.');
+    }
+
+    // ==================== RELATIONSHIPS ====================
+
+    /**
+     * Boarding Schools that this user manages
+     */
+    public function boardingSchools()
+    {
+        return $this->belongsToMany(BoardingSchool::class, 'admin_boarding_schools')
+            ->withTimestamps();
     }
 
     // ==================== SCOPES ====================

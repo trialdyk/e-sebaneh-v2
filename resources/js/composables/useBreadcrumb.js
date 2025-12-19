@@ -14,6 +14,8 @@ export function useBreadcrumb(customItems = null) {
     const pathMap = {
         '/dashboard': { label: 'Dashboard', icon: 'i-lucide-house' },
         '/dashboard/school-years': { label: 'Tahun Ajaran', icon: 'i-lucide-calendar' },
+        '/dashboard/boarding-schools': { label: 'Pondok', icon: 'i-lucide-building-2' },
+        '/dashboard/boarding-schools/create': { label: 'Tambah Pondok', icon: 'i-lucide-plus' },
         '/dashboard/posts': { label: 'Posts', icon: 'i-lucide-file-text' },
         '/dashboard/users': { label: 'Users', icon: 'i-lucide-users' },
         '/dashboard/profile': { label: 'Profil', icon: 'i-lucide-user' },

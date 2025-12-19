@@ -1,94 +1,75 @@
 <template>
-    <DashboardLayout>
-        <UDashboardPanel id="school-years">
-            <template #header>
-                <UDashboardNavbar title="Tahun Ajaran">
-                    <template #leading>
-                        <UDashboardSidebarCollapse />
-                    </template>
-                </UDashboardNavbar>
-            </template>
+    <DashboardPage
+        title="Tahun Ajaran"
+        heading="Daftar Tahun Ajaran"
+        description="Kelola tahun ajaran akademik sekolah"
+        page-id="school-years"
+    >
+        <template #header>
+            <UButton
+                color="primary"
+                icon="i-lucide-plus"
+                label="Tambah Tahun Ajaran"
+                @click="openCreateModal"
+            />
+        </template>
 
-            <template #body>
-                <!-- Breadcrumb -->
-                <div class="px-6 pt-6">
-                    <UBreadcrumb :items="breadcrumbItems" />
-                </div>
-
-                <!-- Header with Add Button -->
-                <div class="flex items-center justify-between px-6 py-4">
+        <!-- School Years Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <UCard v-for="schoolYear in schoolYears" :key="schoolYear.id">
+                <div class="flex items-start justify-between mb-4">
                     <div>
-                        <h2 class="text-2xl font-bold">Daftar Tahun Ajaran</h2>
-                        <p class="text-sm text-gray-500 mt-1">
-                            Kelola tahun ajaran akademik sekolah
+                        <h3 class="text-xl font-bold">{{ schoolYear.name }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            {{ schoolYear.is_active ? 'Tahun Ajaran Aktif' : 'Tidak Aktif' }}
                         </p>
                     </div>
+                    <UBadge
+                        :color="schoolYear.is_active ? 'info' : 'error'"
+                        variant="soft"
+                    >
+                        {{ schoolYear.is_active ? 'Aktif' : 'Non-Aktif' }}
+                    </UBadge>
+                </div>
+
+                <div class="flex gap-2">
                     <UButton
-                        color="primary"
-                        icon="i-lucide-plus"
-                        label="Tambah Tahun Ajaran"
-                        @click="openCreateModal"
+                        v-if="!schoolYear.is_active"
+                        color="success"
+                        variant="soft"
+                        label="Aktifkan"
+                        block
+                        @click="activateSchoolYear(schoolYear)"
+                    />
+                    <UButton
+                        color="neutral"
+                        variant="soft"
+                        icon="i-lucide-pencil"
+                        @click="openEditModal(schoolYear)"
+                    />
+                    <UButton
+                        color="error"
+                        variant="soft"
+                        icon="i-lucide-trash-2"
+                        :disabled="schoolYear.is_active"
+                        @click="openDeleteModal(schoolYear)"
                     />
                 </div>
+            </UCard>
 
-                <!-- School Years Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-6 pb-6">
-                    <UCard v-for="schoolYear in schoolYears" :key="schoolYear.id">
-                        <div class="flex items-start justify-between mb-4">
-                            <div>
-                                <h3 class="text-xl font-bold">{{ schoolYear.name }}</h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                    {{ schoolYear.is_active ? 'Tahun Ajaran Aktif' : 'Tidak Aktif' }}
-                                </p>
-                            </div>
-                            <UBadge
-                                :color="schoolYear.is_active ? 'info' : 'error'"
-                                variant="soft"
-                            >
-                                {{ schoolYear.is_active ? 'Aktif' : 'Non-Aktif' }}
-                            </UBadge>
-                        </div>
-
-                        <div class="flex gap-2">
-                            <UButton
-                                v-if="!schoolYear.is_active"
-                                color="success"
-                                variant="soft"
-                                label="Aktifkan"
-                                block
-                                @click="activateSchoolYear(schoolYear)"
-                            />
-                            <UButton
-                                color="neutral"
-                                variant="soft"
-                                icon="i-lucide-pencil"
-                                @click="openEditModal(schoolYear)"
-                            />
-                            <UButton
-                                color="error"
-                                variant="soft"
-                                icon="i-lucide-trash-2"
-                                :disabled="schoolYear.is_active"
-                                @click="openDeleteModal(schoolYear)"
-                            />
-                        </div>
-                    </UCard>
-
-                    <!-- Empty State -->
-                    <UCard v-if="schoolYears.length === 0">
-                        <div class="text-center py-12">
-                            <UIcon name="i-lucide-calendar" class="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                            <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300">
-                                Belum ada tahun ajaran
-                            </h3>
-                            <p class="text-sm text-gray-500 mt-2">
-                                Klik tombol "Tambah Tahun Ajaran" untuk membuat tahun ajaran baru
-                            </p>
-                        </div>
-                    </UCard>
+            <!-- Empty State -->
+            <UCard v-if="schoolYears.length === 0">
+                <div class="text-center py-12">
+                    <UIcon name="i-lucide-calendar" class="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300">
+                        Belum ada tahun ajaran
+                    </h3>
+                    <p class="text-sm text-gray-500 mt-2">
+                        Klik tombol "Tambah Tahun Ajaran" untuk membuat tahun ajaran baru
+                    </p>
                 </div>
-            </template>
-        </UDashboardPanel>
+            </UCard>
+        </div>
 
         <!-- Create/Edit Modal -->
         <UModal v-model:open="isFormModalOpen">
@@ -165,7 +146,7 @@
             </template>
 
             <template #footer>
-                <div class="flex justify-end gap-2">
+                <div class="flex justify-end gap-2 w-full">
                     <UButton
                         color="neutral"
                         variant="soft"
@@ -182,14 +163,13 @@
                 </div>
             </template>
         </UModal>
-    </DashboardLayout>
+    </DashboardPage>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { useForm, router } from '@inertiajs/vue3';
-import DashboardLayout from '@/Layouts/DashboardLayout.vue';
-import { useBreadcrumb } from '@/composables/useBreadcrumb';
+import DashboardPage from '@/Components/DashboardPage.vue';
 
 const props = defineProps({
     schoolYears: {
@@ -197,9 +177,6 @@ const props = defineProps({
         default: () => [],
     },
 });
-
-// Breadcrumb - auto generate dari URL
-const breadcrumbItems = useBreadcrumb();
 
 // Modals state
 const isFormModalOpen = ref(false);

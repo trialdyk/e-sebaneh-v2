@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\AdminBoardingSchoolController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\BoardingSchoolController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SchoolYearController;
 use Illuminate\Support\Facades\Route;
@@ -68,12 +70,20 @@ Route::middleware('auth')->group(function () {
             Route::resource('school-years', SchoolYearController::class)->except(['show', 'create', 'edit']);
             Route::post('school-years/{school_year}/activate', [SchoolYearController::class, 'activate'])->name('school-years.activate');
 
+            // Boarding Schools
+            Route::resource('boarding-schools', BoardingSchoolController::class);
+
+            // Admin Boarding School Management
+            Route::get('boarding-schools/{boarding_school}/admins', [AdminBoardingSchoolController::class, 'index'])->name('boarding-schools.admins.index');
+            Route::post('boarding-schools/{boarding_school}/admins', [AdminBoardingSchoolController::class, 'store'])->name('boarding-schools.admins.store');
+            Route::delete('boarding-schools/{boarding_school}/admins/{admin}', [AdminBoardingSchoolController::class, 'destroy'])->name('boarding-schools.admins.destroy');
+
             Route::get('/users', function () {
                 return Inertia::render('Dashboard/Users', [
                     'users' => \App\Models\User::with('roles')->latest()->paginate(10),
                 ]);
             })->name('dashboard.users');
-            
+
             Route::get('/posts', function () {
                 return Inertia::render('Dashboard/Posts', [
                     'posts' => [],

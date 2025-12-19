@@ -68,6 +68,10 @@ const links = [[{
     icon: 'i-lucide-calendar',
     to: '/dashboard/school-years'
 }, {
+    label: 'Pondok',
+    icon: 'i-lucide-building-2',
+    to: '/dashboard/boarding-schools'
+}, {
     label: 'Posts',
     icon: 'i-lucide-file-text',
     to: '/dashboard/posts'
