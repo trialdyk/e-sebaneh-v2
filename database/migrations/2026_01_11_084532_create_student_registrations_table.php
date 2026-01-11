@@ -52,8 +52,8 @@ return new class extends Migration
             // Academic Choices (stored as IDs for easy relation later)
             // No strict foreign key constraint needed if we want flexibility, but nullable FK is fine.
             // Using constrained() for safety.
-            $table->foreignUuid('school_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignUuid('school_level_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('school_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('school_level_id')->nullable()->constrained()->nullOnDelete();
 
             $table->timestamps();
         });
