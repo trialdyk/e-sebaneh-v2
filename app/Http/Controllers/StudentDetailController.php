@@ -223,9 +223,8 @@ class StudentDetailController extends Controller
         $validated = $request->validate([
             'juz' => 'nullable|integer|min:1|max:30',
             'surah_id' => 'nullable|exists:surahs,id',
-            'page_start' => 'nullable|integer|min:1',
-            'page_end' => 'nullable|integer|min:1|gte:page_start',
-            'grade' => 'nullable|string|max:50',
+            'verse_start' => 'nullable|integer|min:1',
+            'verse_end' => 'nullable|integer|min:1|gte:verse_start',
             'notes' => 'nullable|string',
             'memorize_date' => 'nullable|date',
         ]);

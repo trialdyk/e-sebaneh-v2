@@ -46,29 +46,35 @@
                             <UInput v-model="form.juz" type="number" min="1" max="30" placeholder="1-30" class="w-full" />
                         </UFormField>
 
+                        <UFormField label="Surah" name="surah_id" :error="form.errors.surah_id">
+                            <USelectMenu 
+                                v-model="form.surah_id" 
+                                :items="surahs" 
+                                label-key="name" 
+                                value-key="id"
+                                placeholder="Pilih Surah" 
+                                searchable
+                                class="w-full"
+                            />
+                            <!-- Debug output -->
+                            <div v-if="false" class="text-xs">{{ surahs ? surahs.length : 0 }} surahs loaded</div>
+                        </UFormField>
+
                         <UFormField label="Tanggal" name="memorize_date" :error="form.errors.memorize_date">
                             <UInput v-model="form.memorize_date" type="date" class="w-full" />
                         </UFormField>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
-                        <UFormField label="Halaman Mulai" name="page_start" :error="form.errors.page_start">
-                            <UInput v-model="form.page_start" type="number" min="1" class="w-full" />
+                        <UFormField label="Ayat Mulai" name="verse_start" :error="form.errors.verse_start">
+                            <UInput v-model="form.verse_start" type="number" min="1" class="w-full" />
                         </UFormField>
 
-                        <UFormField label="Halaman Akhir" name="page_end" :error="form.errors.page_end">
-                            <UInput v-model="form.page_end" type="number" min="1" class="w-full" />
+                        <UFormField label="Ayat Akhir" name="verse_end" :error="form.errors.verse_end">
+                            <UInput v-model="form.verse_end" type="number" min="1" class="w-full" />
                         </UFormField>
                     </div>
 
-                    <UFormField label="Nilai" name="grade" :error="form.errors.grade">
-                        <USelect 
-                            v-model="form.grade" 
-                            :items="gradeOptions"
-                            placeholder="Pilih nilai"
-                            class="w-full" 
-                        />
-                    </UFormField>
 
                     <UFormField label="Catatan" name="notes" :error="form.errors.notes">
                         <UTextarea v-model="form.notes" placeholder="Catatan tambahan..." class="w-full" />
@@ -106,13 +112,17 @@ const props = defineProps({
     memorizes: {
         type: Array,
         default: () => []
+    },
+    surahs: {
+        type: Array,
+        default: () => []
     }
 });
+
 
 const isModalOpen = ref(false);
 const deletingId = ref(null);
 
-const gradeOptions = ['A', 'B', 'C', 'D', 'Mumtaz', 'Jayyid Jiddan', 'Jayyid', 'Maqbul'];
 
 const totalJuz = computed(() => {
     const uniqueJuz = new Set(props.memorizes.map(m => m.juz).filter(Boolean));
@@ -127,19 +137,14 @@ const columns = [
         cell: ({ row }) => row.original.surah?.name || '-'
     },
     { 
-        header: 'Halaman',
+        header: 'Ayat',
         cell: ({ row }) => {
-            const start = row.original.page_start;
-            const end = row.original.page_end;
+            const start = row.original.verse_start;
+            const end = row.original.verse_end;
             if (start && end) return `${start} - ${end}`;
             if (start) return `${start}`;
             return '-';
         }
-    },
-    { accessorKey: 'grade', header: 'Nilai', cell: ({ row }) => row.original.grade || '-' },
-    { 
-        header: 'Penguji',
-        cell: ({ row }) => row.original.teacher?.user?.name || '-'
     },
     { 
         accessorKey: 'memorize_date', 
@@ -151,9 +156,9 @@ const columns = [
 
 const form = useForm({
     juz: '',
-    page_start: '',
-    page_end: '',
-    grade: '',
+    surah_id: '',
+    verse_start: '',
+    verse_end: '',
     notes: '',
     memorize_date: new Date().toISOString().split('T')[0],
 });

@@ -243,6 +243,9 @@ class StudentController extends Controller
     /**
      * Display the specified resource.
      */
+    /**
+     * Display the specified resource.
+     */
     public function show(Student $student)
     {
         $student->load([
@@ -259,8 +262,11 @@ class StudentController extends Controller
             'memorizes.teacher.user',
         ]);
 
+        $surahs = \App\Models\Surah::all();
+
         return Inertia::render('Dashboard/Student/Show', [
             'student' => $student,
+            'surahs' => $surahs,
         ]);
     }
 

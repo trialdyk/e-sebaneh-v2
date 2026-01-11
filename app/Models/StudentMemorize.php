@@ -15,9 +15,8 @@ class StudentMemorize extends Model
         'teacher_id',
         'surah_id',
         'juz',
-        'page_start',
-        'page_end',
-        'grade',
+        'verse_start',
+        'verse_end',
         'notes',
         'memorize_date',
     ];

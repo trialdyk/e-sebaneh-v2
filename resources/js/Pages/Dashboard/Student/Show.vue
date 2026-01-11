@@ -105,6 +105,7 @@
                         v-else-if="activeTab === 5"
                         :student-id="student.id" 
                         :memorizes="student.memorizes || []" 
+                        :surahs="surahs || []"
                     />
 
                     <!-- Permission Tab -->
@@ -140,7 +141,8 @@ import PermissionTab from '@/Components/Student/PermissionTab.vue';
 import ViolationTab from '@/Components/Student/ViolationTab.vue';
 
 const props = defineProps({
-    student: Object
+    student: Object,
+    surahs: Array
 });
 
 const activeTab = ref(0);
