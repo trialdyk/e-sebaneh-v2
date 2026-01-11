@@ -126,4 +126,15 @@ const tabs = [
 ];
 
 const activeTab = ref(props.tab || 'saldo');
+
+import { watch } from 'vue';
+import { router } from '@inertiajs/vue3';
+
+watch(activeTab, (newTab) => {
+    router.get('/dashboard/finance/student-balance', { tab: newTab }, {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+    });
+});
 </script>

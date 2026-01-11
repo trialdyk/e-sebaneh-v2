@@ -124,9 +124,12 @@ class StudentWithdrawController extends Controller
 
                 // Finance System Record
                 $financeService->recordTransaction(
-                    accountSlug: 'student-balances-liability',
+                    accountSlug: 'student-balance',
                     amount: $validated['amount'],
-                    type: \App\Enums\FinanceTransactionTypeEnum::DEBIT, // Liability decreases
+                    type: \App\Enums\FinanceTransactionTypeEnum::DEBIT, // Liability decreases, so DEBIT is correct for liability/income? 
+                    // Wait, 'student-balance' is INCOME type in Observer.
+                    // For INCOME account: Credit increases (Revenue), Debit decreases (Refund/Withdrawal).
+                    // So DEBIT is correct for withdrawal.
                     description: "Penarikan Saldo Santri (RFID): {$student->name}",
                     user: null, // Performed by system/student via RFID kiosk technically, or auth user if logged in kiosk
                     reference: $history,

@@ -50,6 +50,12 @@ class BoardingSchoolObserver
             'balance' => 0,
             'pending_balance' => 0,
         ]);
+
+        // 4. Default Withdraw Limit
+        \App\Models\StudentWithdrawLimit::create([
+            'boarding_school_id' => $boardingSchool->id,
+            'limit' => 50000, // Default limit 50k
+        ]);
     }
 
     /**

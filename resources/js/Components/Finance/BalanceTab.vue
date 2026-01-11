@@ -149,7 +149,7 @@
                             v-model="topupForm.amount"
                             type="number"
                             min="1"
-                            step="1000"
+                            class="w-full"
                             placeholder="Masukkan jumlah..."
                         />
                     </UFormField>
@@ -159,6 +159,7 @@
                             v-model="topupForm.description"
                             placeholder="Keterangan (opsional)..."
                             rows="3"
+                            class="w-full"
                         />
                     </UFormField>
                 </div>
@@ -207,7 +208,7 @@
                             v-model="withdrawForm.amount"
                             type="number"
                             min="1"
-                            step="1000"
+                            class="w-full"
                             placeholder="Masukkan jumlah..."
                         />
                     </UFormField>
@@ -217,6 +218,7 @@
                             v-model="withdrawForm.pin"
                             type="password"
                             maxlength="6"
+                            class="w-full"
                             placeholder="Masukkan PIN 6 digit..."
                         />
                     </UFormField>
@@ -225,6 +227,7 @@
                         <UTextarea
                             v-model="withdrawForm.description"
                             placeholder="Keterangan (opsional)..."
+                            class="w-full"
                             rows="3"
                         />
                     </UFormField>
@@ -272,6 +275,7 @@
                             type="text"
                             maxlength="6"
                             placeholder="Masukkan PIN 6 digit..."
+                            class="w-full"
                         />
                         <template #hint>
                             <p class="text-sm text-gray-500">PIN harus 6 digit angka</p>
@@ -304,7 +308,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
 
@@ -346,12 +350,12 @@ const pinModal = ref({ open: false, student: null });
 
 // Forms
 const topupForm = useForm({
-    amount: '',
+    amount: null,
     description: '',
 });
 
 const withdrawForm = useForm({
-    amount: '',
+    amount: null,
     pin: '',
     description: '',
 });
@@ -398,6 +402,7 @@ const getActionItems = (student) => [[{
     onSelect: () => {
         topupModal.value = { open: true, student };
         topupForm.reset();
+        nextTick(() => topupForm.clearErrors());
     },
 }, {
     label: 'Tarik Saldo',
@@ -406,6 +411,7 @@ const getActionItems = (student) => [[{
     onSelect: () => {
         withdrawModal.value = { open: true, student };
         withdrawForm.reset();
+        nextTick(() => withdrawForm.clearErrors());
     },
 }, {
     label: 'Ubah PIN',
@@ -414,6 +420,7 @@ const getActionItems = (student) => [[{
     onSelect: () => {
         pinModal.value = { open: true, student };
         pinForm.reset();
+        nextTick(() => pinForm.clearErrors());
     },
 }]];
 
@@ -444,7 +451,7 @@ const submitWithdraw = () => {
 const submitUpdatePin = () => {
     if (!pinModal.value.student) return;
     
-    pinForm.put(`/dashboard/finance/student-balance/${pinModal.value.student.id}/update-pin`, {
+    pinForm.put(`/dashboard/finance/student-balance/${pinModal.value.student.id}/pin`, {
         preserveScroll: true,
         onSuccess: () => {
             pinModal.value.open = false;

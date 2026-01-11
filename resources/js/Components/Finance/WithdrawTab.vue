@@ -14,8 +14,18 @@
                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Tempelkan kartu atau masukkan nomor RFID</p>
                     </div>
 
-                    <form @submit.prevent="scanRfid" class="space-y-4">
-                        <UFormField :error="scanError">
+                    <div class="px-4" v-if="scanError">
+                        <UAlert
+                            color="error"
+                            variant="subtle"
+                            icon="i-lucide-alert-circle"
+                            title="Gagal Scan RFID"
+                            :description="scanError"
+                        />
+                    </div>
+
+                    <form @submit.prevent="scanRfid" class="p-4 space-y-4">
+                        <UFormField>
                             <UInput
                                 ref="rfidInput"
                                 v-model="scanForm.rfid"
@@ -132,34 +142,30 @@
                     </template>
 
                     <form @submit.prevent="processWithdraw" class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <UFormField label="Jumlah Penarikan" required :error="withdrawError">
+                        <!-- Alert for Errors -->
+                        <UAlert
+                            v-if="withdrawError || pinError"
+                            color="error"
+                            variant="subtle"
+                            icon="i-lucide-alert-circle"
+                            :title="pinError ? 'PIN Salah' : 'Gagal Memproses Penarikan'"
+                            :description="pinError || withdrawError"
+                        />
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                            <UFormField label="Jumlah Penarikan" required>
                                 <UInput
                                     v-model="withdrawForm.amount"
                                     type="number"
                                     min="1"
-                                    step="1000"
                                     placeholder="Rp 0"
                                     size="xl"
                                     icon="i-lucide-banknote"
+                                    class="w-full"
                                 />
-                                <template #hint>
-                                    <div class="flex gap-2 mt-2">
-                                        <UButton
-                                            v-for="amount in quickAmounts"
-                                            :key="amount"
-                                            size="xs"
-                                            color="neutral"
-                                            variant="soft"
-                                            @click="withdrawForm.amount = amount"
-                                        >
-                                            {{ formatCurrency(amount) }}
-                                        </UButton>
-                                    </div>
-                                </template>
                             </UFormField>
 
-                            <UFormField label="PIN Santri (6 Digit)" required :error="pinError">
+                            <UFormField label="PIN Santri (6 Digit)" required>
                                 <UInput
                                     v-model="withdrawForm.pin"
                                     type="password"
@@ -167,11 +173,29 @@
                                     placeholder="••••••"
                                     size="xl"
                                     icon="i-lucide-lock"
+                                    class="w-full"
                                 />
                             </UFormField>
                         </div>
 
-                        <div class="flex gap-3">
+                        <!-- Quick Amounts (Moved down for alignment) -->
+                        <div>
+                            <p class="text-sm text-gray-500 mb-2">Pilih Nominal Cepat:</p>
+                            <div class="flex flex-wrap gap-2">
+                                <UButton
+                                    v-for="amount in quickAmounts"
+                                    :key="amount"
+                                    size="sm"
+                                    color="neutral"
+                                    variant="soft"
+                                    @click="withdrawForm.amount = amount"
+                                >
+                                    {{ formatCurrency(amount) }}
+                                </UButton>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3 pt-2">
                             <UButton
                                 @click="resetScan"
                                 color="neutral"
@@ -183,7 +207,7 @@
                             </UButton>
                             <UButton
                                 type="submit"
-                                color="error"
+                                color="primary"
                                 size="lg"
                                 class="flex-1"
                                 :loading="processing"

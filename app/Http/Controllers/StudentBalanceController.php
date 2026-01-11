@@ -138,6 +138,19 @@ class StudentBalanceController extends Controller
             return back()->withErrors(['amount' => 'Saldo tidak mencukupi. Saldo saat ini: Rp ' . number_format($student->user->balance, 0, ',', '.')]);
         }
 
+        // Check daily limit
+        $withdrawLimit = \App\Models\StudentWithdrawLimit::where('boarding_school_id', $student->boarding_school_id)->first();
+        
+        $todayWithdraw = StudentWithdrawHistory::where('student_id', $student->id)
+            ->where('type', 'withdraw')
+            ->whereDate('date', today())
+            ->sum('amount');
+
+        if ($withdrawLimit && ($todayWithdraw + $validated['amount']) > $withdrawLimit->limit) {
+            $remaining = max(0, $withdrawLimit->limit - $todayWithdraw);
+            return back()->withErrors(['amount' => 'Melebihi batas penarikan harian. Sisa limit: Rp ' . number_format($remaining, 0, ',', '.')]);
+        }
+
         try {
             DB::transaction(function () use ($validated, $student, $financeService) {
                 $adminName = auth()->user()->name ?? 'Admin';
