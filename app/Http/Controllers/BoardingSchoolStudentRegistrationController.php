@@ -139,12 +139,31 @@ class BoardingSchoolStudentRegistrationController extends Controller
                 ]);
             }
 
-            // 4. Update Registration Status
+            // 4. Update Registration Status (DON'T DELETE)
             $registration->update(['status' => 'accepted']);
         });
 
-        return redirect()->route('dashboard.student-registrations.index')->with('success', 'Santri berhasil diterima.');
+        return back()->with('success', 'Santri berhasil diterima.');
     }
+
+    public function reject(StudentRegistration $registration)
+    {
+        // Scope check
+        $user = auth()->user();
+        if (!$user->boardingSchools->contains($registration->boarding_school_id)) {
+            abort(403);
+        }
+
+        if ($registration->status !== 'pending') {
+            return back()->with('error', 'Status pendaftaran sudah tidak pending.');
+        }
+
+        // Just update status, don't delete
+        $registration->update(['status' => 'rejected']);
+
+        return back()->with('success', 'Pendaftar berhasil ditolak.');
+    }
+
 
     public function downloadPdf(StudentRegistration $registration)
     {

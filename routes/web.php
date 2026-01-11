@@ -116,6 +116,7 @@ Route::middleware('auth')->group(function () {
             Route::get('student-registrations', [\App\Http\Controllers\BoardingSchoolStudentRegistrationController::class, 'index'])->name('student-registrations.index');
             Route::get('student-registrations/{registration}', [\App\Http\Controllers\BoardingSchoolStudentRegistrationController::class, 'show'])->name('student-registrations.show');
             Route::post('student-registrations/{registration}/accept', [\App\Http\Controllers\BoardingSchoolStudentRegistrationController::class, 'accept'])->name('student-registrations.accept');
+            Route::post('student-registrations/{registration}/reject', [\App\Http\Controllers\BoardingSchoolStudentRegistrationController::class, 'reject'])->name('student-registrations.reject');
             Route::get('student-registrations/{registration}/pdf', [\App\Http\Controllers\BoardingSchoolStudentRegistrationController::class, 'downloadPdf'])->name('student-registrations.pdf');
             
             // Student Details - Diseases
