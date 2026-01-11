@@ -17,9 +17,18 @@ class BoardingSchoolController extends Controller
      */
     public function index(): Response
     {
-        $boardingSchools = BoardingSchool::withCounts()
-            ->latest()
-            ->get();
+        $user = auth()->user();
+
+        // Admin-pondok only sees their boarding schools
+        $query = BoardingSchool::withCounts();
+
+        if ($user->hasRole('admin-pondok')) {
+            $query->whereHas('admins', function ($q) use ($user) {
+                $q->where('users.id', $user->id);
+            });
+        }
+
+        $boardingSchools = $query->latest()->get();
 
         return Inertia::render('Dashboard/BoardingSchool/Index', [
             'boardingSchools' => $boardingSchools,

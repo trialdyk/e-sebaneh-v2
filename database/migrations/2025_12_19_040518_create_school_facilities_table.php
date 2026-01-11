@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Table for storing facilities of a boarding school
         Schema::create('school_facilities', function (Blueprint $table) {
             $table->id();
             $table->foreignUuid('boarding_school_id')->constrained()->cascadeOnDelete();

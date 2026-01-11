@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Table for storing academic years (Tahun Ajaran)
         Schema::create('school_years', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('name',10)->unique();
+            $table->id();
+            $table->string('name', 50)->unique(); // e.g., "2024/2025"
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
             $table->boolean('is_active')->default(false);
             $table->timestamps();
         });

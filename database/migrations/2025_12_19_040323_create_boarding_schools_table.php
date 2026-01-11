@@ -11,12 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Table for storing boarding school profiles (cabang pondok)
         Schema::create('boarding_schools', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->text('photo')->nullable();
             $table->string('name');
+            $table->string('slug')->unique();
             $table->text('address');
             $table->text('description')->nullable();
+            $table->string('photo')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('email')->nullable();
+            $table->decimal('balance', 15, 2)->default(0);
             $table->timestamps();
         });
     }

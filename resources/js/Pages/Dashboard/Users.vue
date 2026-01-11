@@ -14,7 +14,7 @@
                     </UButton>
                 </div>
 
-                <UDashboardCard>
+                <UCard>
                     <UTable :rows="users" :columns="columns">
                         <template #name-data="{ row }">
                             <div class="flex items-center gap-3">
@@ -48,7 +48,7 @@
                             </div>
                         </template>
                     </UTable>
-                </UDashboardCard>
+                </UCard>
             </UDashboardPanelContent>
         </UDashboardPanel>
     </DashboardLayout>

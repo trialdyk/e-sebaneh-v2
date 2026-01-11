@@ -41,6 +41,7 @@
                                 :to="`/dashboard/boarding-schools/${boardingSchool.id}/edit`"
                             />
                             <UButton
+                                v-if="isSuperAdmin"
                                 color="error"
                                 variant="soft"
                                 icon="i-lucide-trash-2"
@@ -52,8 +53,8 @@
                 </div>
             </UCard>
 
-            <!-- Admin List -->
-            <UCard>
+            <!-- Admin List (Super Admin Only) -->
+            <UCard v-if="isSuperAdmin">
                 <template #header>
                     <div class="flex items-center justify-between">
                         <h3 class="text-lg font-semibold">Admin Pondok</h3>
@@ -315,13 +316,19 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { router, useForm } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
+import { router, useForm, usePage } from '@inertiajs/vue3';
 import axios from 'axios';
 import DashboardPage from '@/Components/DashboardPage.vue';
 
 const props = defineProps({
     boardingSchool: Object,
+});
+
+const page = usePage();
+const isSuperAdmin = computed(() => {
+    const roles = page.props.auth.user?.roles || [];
+    return roles.includes('super-admin');
 });
 
 // Admin Modal

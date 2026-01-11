@@ -14,9 +14,19 @@ class BoardingSchool extends Model
 
     protected $fillable = [
         'name',
+        'slug',
         'photo',
         'address',
         'description',
+        'phone',
+        'email',
+        'balance',
+        'letter_head_name',
+        'letter_secretary_name',
+    ];
+
+    protected $casts = [
+        'balance' => 'decimal:2',
     ];
 
     protected $appends = [
@@ -53,10 +63,42 @@ class BoardingSchool extends Model
     }
 
     /**
+     * Students (one-to-many)
+     */
+    public function students(): HasMany
+    {
+        return $this->hasMany(Student::class);
+    }
+
+    /**
+     * Teachers (one-to-many)
+     */
+    public function teachers(): HasMany
+    {
+        return $this->hasMany(Teacher::class);
+    }
+
+    /**
+     * Classrooms (one-to-many)
+     */
+    public function classrooms(): HasMany
+    {
+        return $this->hasMany(Classroom::class);
+    }
+
+    /**
+     * Bed Rooms (one-to-many)
+     */
+    public function bedRooms(): HasMany
+    {
+        return $this->hasMany(BedRoom::class);
+    }
+
+    /**
      * Scope for with counts
      */
     public function scopeWithCounts($query)
     {
-        return $query->withCount(['admins', 'facilities']);
+        return $query->withCount(['admins', 'facilities', 'students', 'teachers', 'classrooms']);
     }
 }

@@ -18,7 +18,12 @@
         "@iconify-json/lucide": "^1.2.81",
         "@inertiajs/vue3": "^2.3.3",
         "@nuxt/ui": "^4.3.0",
+        "@tiptap/extension-link": "^3.15.3",
+        "@tiptap/starter-kit": "^3.15.3",
+        "@tiptap/vue-3": "^3.15.3",
         "@vitejs/plugin-vue": "^6.0.3",
+        "date-fns": "^4.1.0",
+        "lodash": "^4.17.21",
         "vue": "^3.5.26"
     }
 }

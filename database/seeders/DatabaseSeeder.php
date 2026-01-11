@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
@@ -21,6 +20,10 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             UserSeeder::class,
             SchoolYearSeeder::class,
+            SchoolSeeder::class,
+            PositionSeeder::class,
+            BoardingSchoolSeeder::class,
+            SurahSeeder::class,
         ]);
     }
 }

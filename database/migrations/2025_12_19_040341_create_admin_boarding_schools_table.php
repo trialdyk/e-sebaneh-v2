@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Pivot table for assigning admins to specific boarding schools
         Schema::create('admin_boarding_schools', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();

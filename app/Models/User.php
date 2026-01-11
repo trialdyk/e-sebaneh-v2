@@ -12,7 +12,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles, UploadTrait;
+    use HasFactory, HasRoles, Notifiable, UploadTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -24,10 +24,13 @@ class User extends Authenticatable
         'phone_number',
         'gender',
         'pin_atm',
-        'balance',
+        'saldo',
         'profile_photo',
         'google_id',
         'google_token',
+        'two_factor_enabled',
+        'two_factor_code',
+        'two_factor_expires_at',
     ];
 
     /**
@@ -38,6 +41,7 @@ class User extends Authenticatable
         'remember_token',
         'google_token',
         'pin_atm',
+        'two_factor_code',
     ];
 
     /**
@@ -47,9 +51,11 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'two_factor_expires_at' => 'datetime',
             'password' => 'hashed',
             'gender' => GenderEnum::class,
-            'balance' => 'integer',
+            'saldo' => 'decimal:2',
+            'two_factor_enabled' => 'boolean',
         ];
     }
 
@@ -68,7 +74,7 @@ class User extends Authenticatable
      */
     public function getProfilePhotoUrlAttribute(): ?string
     {
-        if (!$this->profile_photo) {
+        if (! $this->profile_photo) {
             return null;
         }
 
@@ -96,9 +102,9 @@ class User extends Authenticatable
     /**
      * Get formatted balance
      */
-    public function getFormattedBalanceAttribute(): string
+    public function getFormattedSaldoAttribute(): string
     {
-        return 'Rp '.number_format($this->balance, 0, ',', '.');
+        return 'Rp '.number_format($this->saldo, 0, ',', '.');
     }
 
     // ==================== RELATIONSHIPS ====================
@@ -109,6 +115,32 @@ class User extends Authenticatable
     public function boardingSchools()
     {
         return $this->belongsToMany(BoardingSchool::class, 'admin_boarding_schools')
+            ->withTimestamps();
+    }
+
+    /**
+     * Student profile (if user is a student)
+     */
+    public function student()
+    {
+        return $this->hasOne(Student::class);
+    }
+
+    /**
+     * Teacher profile (if user is a teacher)
+     */
+    public function teacher()
+    {
+        return $this->hasOne(Teacher::class);
+    }
+
+    /**
+     * Students that this user guardians (if user is a parent)
+     */
+    public function students()
+    {
+        return $this->belongsToMany(Student::class, 'student_guardians')
+            ->withPivot('relationship')
             ->withTimestamps();
     }
 
@@ -135,14 +167,14 @@ class User extends Authenticatable
      */
     public function scopeSearch($query, ?string $search)
     {
-        if (!$search) {
+        if (! $search) {
             return $query;
         }
 
         return $query->where(function ($q) use ($search) {
             $q->where('name', 'like', "%{$search}%")
-              ->orWhere('email', 'like', "%{$search}%")
-              ->orWhere('phone_number', 'like', "%{$search}%");
+                ->orWhere('email', 'like', "%{$search}%")
+                ->orWhere('phone_number', 'like', "%{$search}%");
         });
     }
 

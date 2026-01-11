@@ -12,6 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Table for storing user accounts (students, parents, admins, etc.)
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -21,10 +22,13 @@ return new class extends Migration
             $table->string('password');
             $table->enum('gender', [GenderEnum::MALE->value, GenderEnum::FEMALE->value])->nullable();
             $table->string('pin_atm')->nullable();
-            $table->bigInteger('balance')->default(0);
+            $table->decimal('balance', 15, 2)->default(0);
             $table->string('profile_photo')->nullable();
             $table->string('google_id')->nullable()->unique();
             $table->text('google_token')->nullable();
+            $table->boolean('two_factor_enabled')->default(false);
+            $table->string('two_factor_code')->nullable();
+            $table->timestamp('two_factor_expires_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

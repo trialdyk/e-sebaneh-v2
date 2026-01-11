@@ -14,7 +14,7 @@
                     </UButton>
                 </div>
 
-                <UDashboardCard>
+                <UCard>
                     <UTable 
                         :rows="posts" 
                         :columns="columns"
@@ -46,7 +46,7 @@
                             </div>
                         </template>
                     </UTable>
-                </UDashboardCard>
+                </UCard>
             </UDashboardPanelContent>
         </UDashboardPanel>
     </DashboardLayout>
