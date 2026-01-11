@@ -140,7 +140,7 @@ class StudentInvoiceController extends Controller
         ]);
     }
 
-    public function payOffline(Request $request, StudentInvoice $studentInvoice, $studentId)
+    public function payOffline(Request $request, StudentInvoice $studentInvoice, $studentId, \App\Services\FinanceService $financeService)
     {
         $boardingSchoolId = $this->getBoardingSchoolId();
         
@@ -149,7 +149,7 @@ class StudentInvoiceController extends Controller
         }
 
         // Validate student exists and is active
-        $student = \App\Models\Student::where('id', $studentId)
+        $student = \App\Models\Student::with('user')->where('id', $studentId)
             ->where('boarding_school_id', $boardingSchoolId)
             ->firstOrFail();
 
@@ -162,8 +162,8 @@ class StudentInvoiceController extends Controller
             return back()->with('error', 'Santri ini sudah membayar tagihan ini.');
         }
 
-        DB::transaction(function () use ($studentInvoice, $student) {
-            \App\Models\StudentInvoicePayment::create([
+        DB::transaction(function () use ($studentInvoice, $student, $financeService) {
+            $payment = \App\Models\StudentInvoicePayment::create([
                 'student_invoice_id' => $studentInvoice->id,
                 'student_id' => $student->id,
                 'user_id' => auth()->id(),
@@ -172,6 +172,17 @@ class StudentInvoiceController extends Controller
                 'status' => 'paid',
                 'paid_at' => now(),
             ]);
+
+            // Finance System: Record Revenue
+            $financeService->recordTransaction(
+                accountSlug: 'student-invoices',
+                amount: $studentInvoice->amount,
+                type: \App\Enums\FinanceTransactionTypeEnum::CREDIT,
+                description: "Pembayaran Tagihan (Offline): {$studentInvoice->name} - {$student->user->name}",
+                user: auth()->user(),
+                reference: $payment,
+                boardingSchoolId: $studentInvoice->boarding_school_id
+            );
         });
 
         return back()->with('success', 'Pembayaran berhasil dicatat.');

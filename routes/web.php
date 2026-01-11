@@ -145,6 +145,22 @@ Route::middleware('auth')->group(function () {
             // Student Withdraw Limit (Finance)
             Route::get('finance/student-withdraw-limit', [\App\Http\Controllers\StudentWithdrawLimitController::class, 'index'])->name('finance.student-withdraw-limit.index');
             Route::put('finance/student-withdraw-limit', [\App\Http\Controllers\StudentWithdrawLimitController::class, 'update'])->name('finance.student-withdraw-limit.update');
+            
+            // Finance System (Pos & Transactions)
+            Route::controller(\App\Http\Controllers\Dashboard\FinanceAccountController::class)->prefix('finance/accounts')->name('finance.accounts.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::post('/', 'store')->name('store');
+                Route::get('/{account}', 'show')->name('show');
+                Route::get('/{account}/export', 'export')->name('export');
+                Route::put('/{account}', 'update')->name('update');
+                Route::delete('/{account}', 'destroy')->name('destroy');
+            });
+
+            Route::controller(\App\Http\Controllers\Dashboard\FinanceTransactionController::class)->prefix('finance/transactions')->name('finance.transactions.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::get('/export', 'export')->name('export'); 
+                Route::post('/', 'store')->name('store');
+            });
 
             // Student Balance Management
             Route::get('finance/student-balance', [\App\Http\Controllers\StudentBalanceController::class, 'index'])->name('finance.student-balance.index');

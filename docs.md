@@ -54,9 +54,12 @@ Akses terbatas ke pondok yang ditugaskan saja (scoped access).
 | Data Kamar | `/dashboard/bed-rooms` | CRUD kamar |
 | Data Pegawai | `/dashboard/teachers` | CRUD pegawai |
 | Pengaturan Surat | `/dashboard/settings/letter` | Setting kop surat |
-| Batas Penarikan | `/dashboard/finance/student-withdraw-limit` | Limit withdraw |
-| Manajemen Saldo | `/dashboard/finance/student-balance` | Saldo, penarikan RFID, riwayat |
-| Tagihan Santri | `/dashboard/finance/student-invoices` | Kelola tagihan SPP, dll |
+| **Keuangan** | | |
+| - Pos Keuangan | `/dashboard/finance/accounts` | Kelola pos/akun keuangan |
+| - Laporan Arus Kas | `/dashboard/finance/transactions` | Riwayat transaksi & laporan |
+| - Batas Penarikan | `/dashboard/finance/student-withdraw-limit` | Limit withdraw |
+| - Manajemen Saldo | `/dashboard/finance/student-balance` | Saldo, penarikan RFID, riwayat |
+| - Tagihan Santri | `/dashboard/finance/student-invoices` | Kelola tagihan SPP, dll |
 | Pendaftaran (PSB) | `/dashboard/student-registrations` | Manajemen pendaftaran santri baru |
 
 ---
@@ -222,7 +225,71 @@ Akses terbatas ke pondok yang ditugaskan saja (scoped access).
 
 ---
 
-### 9. CMS Website
+### 9. Manajemen Keuangan (Finance)
+
+#### A. Pos Keuangan (Finance Accounts)
+
+**Route**: `/dashboard/finance/accounts`
+
+**Konsep**: Sistem pos keuangan dengan tracking saldo tersedia dan saldo pending (tertahan di super admin).
+
+**Fitur:**
+
+-   **3 Pos Sistem (Tidak Bisa Edit/Hapus)**:
+    -   **Saldo Santri** (`student-balance`): Untuk penarikan RFID santri
+    -   **Tabungan Santri** (`student-savings`): Tabungan jangka panjang santri
+    -   **Tagihan Santri** (`student-invoices`): Pendapatan dari pembayaran SPP/tagihan
+-   **Pos Custom**: Admin bisa membuat pos tambahan (Kas Pembangunan, Dana Qurban, dll)
+-   **Pending Balance System**:
+    -   `balance`: Saldo tersedia yang bisa digunakan
+    -   `pending_balance`: Saldo tertahan di super admin (dari pembayaran via API)
+    -   Alert otomatis jika ada dana pending
+-   **Detail Pos**: Klik card untuk lihat riwayat transaksi per pos
+-   **CRUD**: Create, Read, Update, Delete (kecuali pos sistem)
+
+**Display:**
+
+```
+Pos: Saldo Santri
+├─ Total Saldo: Rp 7.000.000
+├─ Saldo Tersedia: Rp 5.000.000
+└─ Saldo Pending: Rp 2.000.000 (di Super Admin)
+```
+
+#### B. Laporan Arus Kas (Transactions)
+
+**Route**: `/dashboard/finance/transactions`
+
+**Fitur:**
+
+-   **Filter**:
+    -   Tanggal Mulai - Tanggal Akhir
+    -   Pos Keuangan
+-   **Catat Transaksi Manual**:
+    -   Pilih pos keuangan
+    -   Jenis: Pemasukan (Credit) / Pengeluaran (Debit)
+    -   Jumlah & Deskripsi
+    -   Otomatis update saldo pos terkait
+-   **Tabel Transaksi**:
+    -   Tanggal, Pos Keuangan, Keterangan, Nominal, Admin
+    -   Pagination & sorting
+-   **Export Excel**: Sesuai filter yang aktif
+
+**Alur Transaksi:**
+
+**Pembayaran Offline (Tunai)**:
+
+1. Admin catat manual → Langsung masuk ke `balance` pos terkait
+
+**Pembayaran Online (via API)** - _Future_:
+
+1. Santri bayar via app → Masuk ke `pending_balance` pos + Kas Super Admin
+2. Admin pondok request penarikan → Super admin approve
+3. Pindah dari `pending_balance` ke `balance` (tersedia)
+
+---
+
+### 10. CMS Website
 
 **Route Prefix**: `/dashboard/cms`
 
@@ -237,7 +304,7 @@ Akses terbatas ke pondok yang ditugaskan saja (scoped access).
 
 ---
 
-### 8. Pengaturan Surat
+### 11. Pengaturan Surat
 
 **Route**: `/dashboard/settings/letter`
 
@@ -248,7 +315,7 @@ Akses terbatas ke pondok yang ditugaskan saja (scoped access).
 
 ---
 
-### 11. Pendaftaran Santri Baru (PSB Online)
+### 12. Pendaftaran Santri Baru (PSB Online)
 
 **Route**:
 
@@ -368,9 +435,9 @@ Akses terbatas ke pondok yang ditugaskan saja (scoped access).
 
 ## Fitur yang Belum Diimplementasikan
 
--   [ ] Finance: Tagihan (Invoice)
--   [ ] Finance: Riwayat Saldo (WithDraw History)
--   [ ] Finance: Tabungan (Savings)
+-   [x] Finance: Pos Keuangan & Transaksi (Accounts & Transactions)
+-   [x] Finance: Pending Balance untuk pembayaran via API
+-   [ ] Finance: Permintaan Penarikan ke Super Admin
 -   [ ] PPOB Payment Integration
 -   [ ] Letter/Surat Generation
 -   [x] Student Registration (PSB Online)

@@ -6,20 +6,23 @@ enum FinanceAccountTypeEnum: string
 {
     case INCOME = 'income';
     case EXPENSE = 'expense';
+    case GENERAL = 'general';
 
     public function label(): string
     {
         return match ($this) {
             self::INCOME => 'Pemasukan',
             self::EXPENSE => 'Pengeluaran',
+            self::GENERAL => 'Umum',
         };
     }
 
     public function color(): string
     {
         return match ($this) {
-            self::INCOME => 'green',
-            self::EXPENSE => 'red',
+            self::INCOME => 'success',
+            self::EXPENSE => 'error',
+            self::GENERAL => 'info',
         };
     }
 
@@ -36,6 +39,7 @@ enum FinanceAccountTypeEnum: string
         return match ($value) {
             'income' => 'Pemasukan',
             'expense' => 'Pengeluaran',
+            'general' => 'Umum',
             default => $value,
         };
     }

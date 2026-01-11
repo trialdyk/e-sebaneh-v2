@@ -164,6 +164,18 @@ const links = computed(() => {
             defaultOpen: page.url.startsWith('/dashboard/finance'),
             children: [
                 {
+                    label: 'Pos Keuangan',
+                    to: '/dashboard/finance/accounts',
+                    icon: 'i-lucide-landmark',
+                    onSelect: () => { open.value = false; }
+                },
+                {
+                    label: 'Laporan Arus Kas',
+                    to: '/dashboard/finance/transactions',
+                    icon: 'i-lucide-scroll-text',
+                    onSelect: () => { open.value = false; }
+                },
+                {
                     label: 'Manajemen Saldo',
                     to: '/dashboard/finance/student-balance',
                     icon: 'i-lucide-banknote',

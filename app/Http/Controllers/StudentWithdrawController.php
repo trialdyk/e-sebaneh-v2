@@ -56,7 +56,10 @@ class StudentWithdrawController extends Controller
     /**
      * Process withdraw via RFID scan.
      */
-    public function processWithdraw(Request $request)
+    /**
+     * Process withdraw via RFID scan.
+     */
+    public function processWithdraw(Request $request, \App\Services\FinanceService $financeService)
     {
         $validated = $request->validate([
             'rfid' => 'required|string',
@@ -108,16 +111,27 @@ class StudentWithdrawController extends Controller
 
         // Process withdraw
         try {
-            DB::transaction(function () use ($validated, $student) {
-                $student->user->decrement('saldo', $validated['amount']);
+            DB::transaction(function () use ($validated, $student, $financeService) {
+                $student->user->decrement('balance', $validated['amount']);
 
-                StudentWithdrawHistory::create([
+                $history = StudentWithdrawHistory::create([
                     'student_id' => $student->id,
                     'amount' => $validated['amount'],
                     'type' => 'withdraw',
                     'date' => now(),
                     'description' => 'Penarikan via RFID',
                 ]);
+
+                // Finance System Record
+                $financeService->recordTransaction(
+                    accountSlug: 'student-balances-liability',
+                    amount: $validated['amount'],
+                    type: \App\Enums\FinanceTransactionTypeEnum::DEBIT, // Liability decreases
+                    description: "Penarikan Saldo Santri (RFID): {$student->name}",
+                    user: null, // Performed by system/student via RFID kiosk technically, or auth user if logged in kiosk
+                    reference: $history,
+                    boardingSchoolId: $student->boarding_school_id
+                );
             });
 
             return response()->json([

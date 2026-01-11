@@ -24,7 +24,8 @@ class DatabaseSeeder extends Seeder
             PositionSeeder::class,
             BoardingSchoolSeeder::class,
             SurahSeeder::class,
-            CMSeeder::class,
+            CMSSeeder::class,
+            SystemFinanceAccountSeeder::class,
         ]);
     }
 }

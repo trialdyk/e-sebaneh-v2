@@ -70,7 +70,7 @@ class StudentBalanceController extends Controller
     /**
      * Topup student balance by admin.
      */
-    public function topup(Request $request, Student $student)
+    public function topup(Request $request, Student $student, \App\Services\FinanceService $financeService)
     {
         $validated = $request->validate([
             'amount' => 'required|numeric|min:1',
@@ -81,18 +81,29 @@ class StudentBalanceController extends Controller
         ]);
 
         try {
-            DB::transaction(function () use ($validated, $student) {
+            DB::transaction(function () use ($validated, $student, $financeService) {
                 $adminName = auth()->user()->name ?? 'Admin';
 
                 $student->user->increment('balance', $validated['amount']);
 
-                StudentWithdrawHistory::create([
+                $history = StudentWithdrawHistory::create([
                     'student_id' => $student->id,
                     'amount' => $validated['amount'],
                     'type' => 'topup_by_admin',
                     'date' => now(),
                     'description' => $validated['description'] ?? "Topup oleh {$adminName}",
                 ]);
+
+                // Finance System Record
+                $financeService->recordTransaction(
+                    accountSlug: 'student-balance',
+                    amount: $validated['amount'],
+                    type: \App\Enums\FinanceTransactionTypeEnum::CREDIT, // Liability increases (Money In to System Control)
+                    description: "Topup Saldo Santri: {$student->name} ({$history->description})",
+                    user: auth()->user(),
+                    reference: $history,
+                    boardingSchoolId: $student->boarding_school_id
+                );
             });
 
             return back()->with('success', 'Saldo berhasil ditambahkan sebesar Rp ' . number_format($validated['amount'], 0, ',', '.'));
@@ -104,7 +115,7 @@ class StudentBalanceController extends Controller
     /**
      * Withdraw student balance by admin.
      */
-    public function withdraw(Request $request, Student $student)
+    public function withdraw(Request $request, Student $student, \App\Services\FinanceService $financeService)
     {
         $validated = $request->validate([
             'amount' => 'required|numeric|min:1',
@@ -128,18 +139,29 @@ class StudentBalanceController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($validated, $student) {
+            DB::transaction(function () use ($validated, $student, $financeService) {
                 $adminName = auth()->user()->name ?? 'Admin';
 
                 $student->user->decrement('balance', $validated['amount']);
 
-                StudentWithdrawHistory::create([
+                $history = StudentWithdrawHistory::create([
                     'student_id' => $student->id,
                     'amount' => $validated['amount'],
                     'type' => 'withdraw',
                     'date' => now(),
                     'description' => $validated['description'] ?? "Penarikan oleh {$adminName}",
                 ]);
+
+                // Finance System Record
+                $financeService->recordTransaction(
+                    accountSlug: 'student-balance',
+                    amount: $validated['amount'],
+                    type: \App\Enums\FinanceTransactionTypeEnum::DEBIT, // Liability decreases (Money Out from System Control)
+                    description: "Penarikan Saldo Santri: {$student->name} ({$history->description})",
+                    user: auth()->user(),
+                    reference: $history,
+                    boardingSchoolId: $student->boarding_school_id
+                );
             });
 
             return back()->with('success', 'Saldo berhasil ditarik sebesar Rp ' . number_format($validated['amount'], 0, ',', '.'));

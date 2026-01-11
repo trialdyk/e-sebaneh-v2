@@ -15,12 +15,17 @@ class FinanceAccount extends Model
     protected $fillable = [
         'boarding_school_id',
         'name',
+        'slug',
         'type',
         'balance',
+        'pending_balance',
+        'description',
+        'is_system',
     ];
 
     protected $casts = [
         'balance' => 'decimal:2',
+        'pending_balance' => 'decimal:2',
         'type' => FinanceAccountTypeEnum::class,
     ];
 

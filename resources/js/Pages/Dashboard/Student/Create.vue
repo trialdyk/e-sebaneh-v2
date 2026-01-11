@@ -348,21 +348,21 @@ const fetchRegencies = async () => {
     form.regency_id = null; form.district_id = null; form.village_id = null;
     regencies.value = []; districts.value = []; villages.value = [];
     if (!form.province_id) return;
-    try { const { data } = await axios.get(`/dashboard/region/${form.province_id}/regencies`); regencies.value = data; } catch (e) { console.error(e); }
+    try { const { data } = await axios.get(`/region/${form.province_id}/regencies`); regencies.value = data; } catch (e) { console.error(e); }
 };
 
 const fetchDistricts = async () => {
     form.district_id = null; form.village_id = null;
     districts.value = []; villages.value = [];
     if (!form.regency_id) return;
-    try { const { data } = await axios.get(`/dashboard/region/${form.regency_id}/districts`); districts.value = data; } catch (e) { console.error(e); }
+    try { const { data } = await axios.get(`/region/${form.regency_id}/districts`); districts.value = data; } catch (e) { console.error(e); }
 };
 
 const fetchVillages = async () => {
     form.village_id = null;
     villages.value = [];
     if (!form.district_id) return;
-    try { const { data } = await axios.get(`/dashboard/region/${form.district_id}/villages`); villages.value = data; } catch (e) { console.error(e); }
+    try { const { data } = await axios.get(`/region/${form.district_id}/villages`); villages.value = data; } catch (e) { console.error(e); }
 };
 
 // Formal School Logic
