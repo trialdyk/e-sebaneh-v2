@@ -71,7 +71,7 @@
                     color="primary"
                     variant="outline"
                     icon="i-lucide-download"
-                    :href="exportUrl"
+                    @click="downloadExcel"
                 >
                     Export Excel
                 </UButton>
@@ -314,6 +314,10 @@ const exportUrl = computed(() => {
     if (filters.value.classroom_id) params.set('classroom_id', filters.value.classroom_id);
     return `/dashboard/students/export/excel${params.toString() ? '?' + params.toString() : ''}`;
 });
+
+const downloadExcel = () => {
+    window.location.href = exportUrl.value;
+};
 
 const columns = [
     { id: 'title', header: 'Nama & NIS' }, // Virtual

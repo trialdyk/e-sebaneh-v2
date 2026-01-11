@@ -50,6 +50,10 @@ class StudentsExport implements
                     'child_number' => 2,
                     'siblings_count' => 3,
                     'address' => 'Jl. Merdeka No. 10, RT 01/RW 02',
+                    'province' => 'DKI Jakarta',
+                    'regency' => 'Jakarta Selatan',
+                    'district' => 'Tebet',
+                    'village' => 'Tebet Barat',
                     'father_name' => 'Budi Santoso',
                     'father_job' => 'Wiraswasta',
                     'father_phone' => '081122334455',
@@ -58,32 +62,14 @@ class StudentsExport implements
                     'mother_job' => 'Ibu Rumah Tangga',
                     'mother_phone' => '081122334466',
                     'mother_income' => '0',
-                ],
-                (object) [
-                    'student_id' => '2024002',
-                    'user' => (object) ['name' => 'Fatimah Azzahra', 'email' => 'fatimah@example.com', 'phone_number' => '089876543210'],
-                    'gender' => 'female',
-                    'status' => 'active',
-                    'place_of_birth' => 'Surabaya',
-                    'date_of_birth' => '2011-08-20',
-                    'child_number' => 1,
-                    'siblings_count' => 2,
-                    'address' => 'Jl. Pahlawan No. 25, Dusun Makmur',
-                    'father_name' => 'Hasan Abdullah',
-                    'father_job' => 'Pegawai Negeri',
-                    'father_phone' => '081234567899',
-                    'father_income' => '7000000',
-                    'mother_name' => 'Khadijah Nur',
-                    'mother_job' => 'Guru',
-                    'mother_phone' => '081234567888',
-                    'mother_income' => '4000000',
+                    'schools' => collect([]), // Sample empty schools
                 ],
             ]);
         }
 
         $user = auth()->user();
         
-        $query = Student::with(['user', 'boardingSchool']);
+        $query = Student::with(['user', 'boardingSchool', 'schools']);
 
         // Scope to admin's boarding schools
         if ($user->hasRole('admin-pondok')) {
@@ -118,6 +104,10 @@ class StudentsExport implements
             'Anak Ke-',
             'Jumlah Saudara',
             'Alamat',
+            'Provinsi',
+            'Kabupaten/Kota',
+            'Kecamatan',
+            'Desa/Kelurahan',
             'Nama Ayah',
             'Pekerjaan Ayah',
             'No. HP Ayah',
@@ -126,6 +116,8 @@ class StudentsExport implements
             'Pekerjaan Ibu',
             'No. HP Ibu',
             'Penghasilan Ibu',
+            'Sekolah Formal',
+            'Tingkat Sekolah Formal',
         ];
     }
 
@@ -135,20 +127,35 @@ class StudentsExport implements
         $rowNumber++;
 
         // Convert gender to Indonesian
-        $gender = match ($student->gender) {
+        $genderValue = $student->gender instanceof \BackedEnum ? $student->gender->value : $student->gender;
+        $gender = match ($genderValue) {
             'male' => 'Laki-laki',
             'female' => 'Perempuan',
-            default => $student->gender,
+            default => $genderValue,
         };
 
         // Convert status to Indonesian
-        $status = match ($student->status) {
+        $statusValue = $student->status instanceof \BackedEnum ? $student->status->value : $student->status;
+        $status = match ($statusValue) {
             'active' => 'Aktif',
             'inactive' => 'Tidak Aktif',
             'graduated' => 'Lulus',
             'dropped_out' => 'Keluar/DO',
-            default => $student->status,
+            default => $statusValue,
         };
+
+        // Formal School Data
+        $schoolName = '-';
+        $schoolLevelName = '-';
+        $school = $student->schools->first(); // Take the first attached school
+        if ($school) {
+            $schoolName = $school->name;
+            $levelId = $school->pivot->school_level_id;
+            if ($levelId) {
+                // Determine level name. Optimization: Could eager load or cache, but fine for simple export
+                $schoolLevelName = \App\Models\SchoolLevel::find($levelId)?->name ?? '-';
+            }
+        }
 
         return [
             $rowNumber,
@@ -159,10 +166,14 @@ class StudentsExport implements
             $gender,
             $status,
             $student->place_of_birth ?? '-',
-            $student->date_of_birth ?? '-',
+            $student->date_of_birth instanceof \Carbon\Carbon ? $student->date_of_birth->format('d-m-Y') : ($student->date_of_birth ?? '-'),
             $student->child_number ?? '-',
             $student->siblings_count ?? '-',
             $student->address ?? '-',
+            $student->province ?? '-',
+            $student->regency ?? '-',
+            $student->district ?? '-',
+            $student->village ?? '-',
             $student->father_name ?? '-',
             $student->father_job ?? '-',
             $student->father_phone ?? '-',
@@ -171,6 +182,8 @@ class StudentsExport implements
             $student->mother_job ?? '-',
             $student->mother_phone ?? '-',
             $student->mother_income ?? '-',
+            $schoolName,
+            $schoolLevelName,
         ];
     }
 
