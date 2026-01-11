@@ -249,7 +249,7 @@ class StudentController extends Controller
             'user', 
             'boardingSchool',
             'classrooms.schoolYear',
-            'bedRooms.schoolYear',
+            'bedRooms',
             'schools.schoolLevels',
             'currentClassroom.classroom',
             'diseases',
