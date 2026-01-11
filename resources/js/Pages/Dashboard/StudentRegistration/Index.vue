@@ -21,18 +21,14 @@
                 :data="registrations.data" 
                 :columns="columns"
             >
-                <template #created_at-data="{ row }">
-                    {{ new Date(row.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) }}
-                </template>
-                
-                <template #status-data="{ row }">
-                    <UBadge :color="getStatusColor(row.status)" variant="subtle">
-                        {{ getStatusLabel(row.status) }}
+                <template #status-cell="{ row }">
+                    <UBadge :color="getStatusColor(row.original.status)" variant="subtle">
+                        {{ getStatusLabel(row.original.status) }}
                     </UBadge>
                 </template>
                 
-                <template #actions-data="{ row }">
-                    <UDropdownMenu :items="getActionItems(row)">
+                <template #actions-cell="{ row }">
+                    <UDropdownMenu :items="getActionItems(row.original)">
                         <UButton color="neutral" variant="ghost" icon="i-lucide-more-horizontal" />
                     </UDropdownMenu>
                 </template>
@@ -72,10 +68,10 @@ const statusOptions = [
 const columns = [
     { accessorKey: 'registration_number', header: 'No. Daftar' },
     { accessorKey: 'name', header: 'Nama Lengkap' },
-    { accessorKey: 'gender', header: 'L/P' },
+    { accessorKey: 'gender', header: 'L/P', cell: ({ row }) => row.original.gender === 'male' ? 'Laki-Laki' : 'Perempuan' },
     { accessorKey: 'regency', header: 'Asal Kota' },
-    { id: 'created_at', header: 'Tanggal Daftar' }, // Virtual - uses template
-    { id: 'status', header: 'Status' }, // Virtual - uses template
+    { accessorKey: 'created_at', header: 'Tanggal Daftar', cell: ({ row }) => new Date(row.original.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) },
+    { id: 'status', header: 'Status' }, // Virtual - uses template for badge
     { id: 'actions', header: '' }, // Virtual - uses template
 ];
 

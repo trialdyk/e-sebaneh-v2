@@ -222,7 +222,7 @@ class BoardingSchoolStudentRegistrationController extends Controller
             // Footer
             $templateProcessor->setValue('date', date('d F Y'));
             
-            $filename = 'Pendaftaran_' . $registration->registration_number . '.docx';
+            $filename = 'Formulir_Pendaftaran_' . $registration->registration_number . '.docx';
             $tempPath = storage_path('app/public/' . $filename);
             
             // Ensure directory exists

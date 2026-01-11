@@ -7,22 +7,7 @@
         back-url="/dashboard/student-registrations"
     >
         <template #actions>
-            <UButton 
-                :href="route('dashboard.student-registrations.pdf', registration.id)"
-                target="_blank"
-                color="neutral" 
-                variant="outline" 
-                icon="i-lucide-file-text" 
-                label="Cetak Formulir (Word)" 
-            />
-            
-            <UButton 
-                v-if="registration.status === 'pending'"
-                @click="openAcceptModal" 
-                color="primary" 
-                icon="i-lucide-check-circle" 
-                label="Terima Santri" 
-            />
+            <!-- No actions in header -->
         </template>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -125,18 +110,31 @@
                 <div v-else class="bg-gray-100 rounded-lg h-48 flex items-center justify-center text-gray-400">
                     <span class="text-sm">Tidak ada foto</span>
                 </div>
+                
+                <!-- Action Button -->
+                <!-- Action Button -->
+                <div class="mt-6 border-t pt-4" v-if="false">
+                    <button 
+                        @click="openAcceptModal" 
+                        class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                    >
+                        <span class="i-lucide-check-circle w-5 h-5" />
+                        Terima Santri
+                    </button>
+                    <!-- Debug info -->
+                    <div class="text-xs text-gray-400 mt-2 text-center">
+                        Status: {{ registration.status }} (Click to accept)
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Accept Modal -->
-        <UModal v-model="showAcceptModal" title="Konfirmasi Terima Santri">
-            <div class="p-4 space-y-4">
-                <p>Apakah Anda yakin ingin menerima calon santri ini? Data akan dipindahkan ke Data Santri Utama.</p>
-                <div class="flex justify-end gap-2">
-                    <UButton label="Batal" color="neutral" variant="ghost" @click="showAcceptModal = false" />
-                    <UButton label="Ya, Terima Santri" color="success" :loading="processing" @click="confirmAccept" />
-                </div>
-            </div>
+        <UModal v-model="showAcceptModal" title="Konfirmasi Terima Santri" description="Apakah Anda yakin ingin menerima calon santri ini? Data akan dipindahkan ke Data Santri Utama.">
+            <template #footer>
+                <UButton label="Batal" color="neutral" variant="ghost" @click="showAcceptModal = false" />
+                <UButton label="Ya, Terima Santri" color="success" :loading="processing" @click="confirmAccept" />
+            </template>
         </UModal>
     </DashboardPage>
 </template>
@@ -154,12 +152,13 @@ const showAcceptModal = ref(false);
 const processing = ref(false);
 
 const openAcceptModal = () => {
+    console.log('Button clicked!');
     showAcceptModal.value = true;
 };
 
 const confirmAccept = () => {
     processing.value = true;
-    router.post(route('dashboard.student-registrations.accept', props.registration.id), {}, {
+    router.post(`/dashboard/student-registrations/${props.registration.id}/accept`, {}, {
         onFinish: () => {
             processing.value = false;
             showAcceptModal.value = false;
