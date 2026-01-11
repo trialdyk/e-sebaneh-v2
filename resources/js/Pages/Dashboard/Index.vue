@@ -82,7 +82,7 @@
                             <template #header>
                                 <div class="flex items-center justify-between">
                                     <h3 class="font-semibold">Distribusi Gender</h3>
-                                    <UBadge color="primary" variant="subtle">Total: {{ genderData.male + genderData.female }}</UBadge>
+                                    <UBadge color="primary" variant="subtle">Total: {{ genderDataComputed.male + genderDataComputed.female }}</UBadge>
                                 </div>
                             </template>
 
@@ -91,14 +91,14 @@
                                     <div class="w-24 h-24 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-3">
                                         <UIcon name="i-lucide-user" class="w-12 h-12 text-blue-600" />
                                     </div>
-                                    <p class="text-2xl font-bold text-blue-600">{{ genderData.male }}</p>
+                                    <p class="text-2xl font-bold text-blue-600">{{ genderDataComputed.male }}</p>
                                     <p class="text-sm text-muted">Laki-laki</p>
                                 </div>
                                 <div class="text-center">
                                     <div class="w-24 h-24 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center mb-3">
                                         <UIcon name="i-lucide-user" class="w-12 h-12 text-pink-600" />
                                     </div>
-                                    <p class="text-2xl font-bold text-pink-600">{{ genderData.female }}</p>
+                                    <p class="text-2xl font-bold text-pink-600">{{ genderDataComputed.female }}</p>
                                     <p class="text-sm text-muted">Perempuan</p>
                                 </div>
                             </div>
@@ -114,7 +114,7 @@
                             </template>
 
                             <div class="space-y-4">
-                                <div v-for="(age, index) in ageData" :key="index">
+                                <div v-for="(age, index) in ageDataComputed" :key="index">
                                     <div class="flex items-center justify-between mb-1">
                                         <span class="text-sm font-medium">{{ age.label }}</span>
                                         <span class="text-sm text-muted">{{ age.value }} santri</span>
@@ -162,13 +162,13 @@
                                 </div>
                             </template>
 
-                            <div v-if="recentPermissions.length === 0" class="text-center py-8">
+                            <div v-if="recentPermissionsComputed.length === 0" class="text-center py-8">
                                 <UIcon name="i-lucide-inbox" class="w-12 h-12 text-muted mx-auto mb-2" />
                                 <p class="text-muted text-sm">Belum ada data izin</p>
                             </div>
                             <div v-else class="space-y-3">
                                 <div 
-                                    v-for="item in recentPermissions" 
+                                    v-for="item in recentPermissionsComputed" 
                                     :key="item.id"
                                     class="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50"
                                 >
@@ -193,13 +193,13 @@
                                 </div>
                             </template>
 
-                            <div v-if="recentViolations.length === 0" class="text-center py-8">
+                            <div v-if="recentViolationsComputed.length === 0" class="text-center py-8">
                                 <UIcon name="i-lucide-check-circle" class="w-12 h-12 text-success mx-auto mb-2" />
                                 <p class="text-muted text-sm">Tidak ada pelanggaran tercatat 🎉</p>
                             </div>
                             <div v-else class="space-y-3">
                                 <div 
-                                    v-for="item in recentViolations" 
+                                    v-for="item in recentViolationsComputed" 
                                     :key="item.id"
                                     class="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50"
                                 >
@@ -226,13 +226,13 @@
                                 </div>
                             </template>
 
-                            <div v-if="boardingSchools.length === 0" class="text-center py-8">
+                            <div v-if="boardingSchoolsComputed.length === 0" class="text-center py-8">
                                 <UIcon name="i-lucide-building-2" class="w-12 h-12 text-muted mx-auto mb-2" />
                                 <p class="text-muted text-sm">Belum ada pondok terdaftar</p>
                             </div>
                             <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 <div 
-                                    v-for="school in boardingSchools"
+                                    v-for="school in boardingSchoolsComputed"
                                     :key="school.id"
                                     class="p-4 rounded-lg border border-default hover:border-primary transition-colors"
                                 >
@@ -260,6 +260,19 @@ import DashboardLayout from '@/Layouts/DashboardLayout.vue';
 
 const page = usePage();
 
+// Define props
+const props = defineProps({
+    stats: {
+        type: Object,
+        default: () => ({})
+    },
+    genderData: Object,
+    ageData: Array,
+    recentPermissions: Array,
+    recentViolations: Array,
+    boardingSchools: Array,
+});
+
 // User info
 const user = computed(() => page.props.auth.user);
 const userName = computed(() => user.value?.name?.split(' ')[0] || 'Admin');
@@ -284,98 +297,88 @@ const greeting = computed(() => {
     return 'Selamat Malam';
 });
 
-// Admin Pondok Stats - Static data (empty/zero)
-const adminStats = [
+// Format currency
+const formatCurrency = (value) => {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
+};
+
+// Admin Pondok Stats - Dynamic data from props
+const adminStats = computed(() => [
     {
         title: 'Total Santri',
-        value: 0,
-        subtitle: 'Aktif di pondok',
+        value: props.stats?.students || 0,
+        subtitle: 'Santri aktif',
         icon: 'i-lucide-users',
         gradient: 'bg-gradient-to-br from-blue-500 to-blue-600'
     },
     {
         title: 'Total Kelas',
-        value: 0,
+        value: props.stats?.classrooms || 0,
         subtitle: 'Kelas aktif',
         icon: 'i-lucide-school',
         gradient: 'bg-gradient-to-br from-purple-500 to-purple-600'
     },
     {
         title: 'Total Pegawai',
-        value: 0,
+        value: props.stats?.teachers || 0,
         subtitle: 'Ustadz & Staff',
         icon: 'i-lucide-user-cog',
         gradient: 'bg-gradient-to-br from-emerald-500 to-emerald-600'
     },
     {
-        title: 'Total Kamar',
-        value: 0,
-        subtitle: 'Kamar asrama',
-        icon: 'i-lucide-bed',
+        title: 'Total Saldo',
+        value: formatCurrency(props.stats?.total_balance || 0),
+        subtitle: 'Semua pos keuangan',
+        icon: 'i-lucide-wallet',
         gradient: 'bg-gradient-to-br from-orange-500 to-orange-600'
     }
-];
+]);
 
-// Super Admin Stats - Static data (empty/zero)
-const superAdminStats = [
+// Super Admin Stats - Dynamic data from props
+const superAdminStats = computed(() => [
     {
         title: 'Total Pondok',
-        value: 0,
+        value: props.stats?.boarding_schools || 0,
         subtitle: 'Terdaftar di sistem',
         icon: 'i-lucide-building-2',
         gradient: 'bg-gradient-to-br from-primary-500 to-primary-600'
     },
     {
         title: 'Total Santri',
-        value: 0,
+        value: props.stats?.students || 0,
         subtitle: 'Semua pondok',
         icon: 'i-lucide-users',
         gradient: 'bg-gradient-to-br from-blue-500 to-blue-600'
     },
     {
         title: 'Total Pegawai',
-        value: 0,
+        value: props.stats?.teachers || 0,
         subtitle: 'Semua pondok',
         icon: 'i-lucide-user-cog',
         gradient: 'bg-gradient-to-br from-emerald-500 to-emerald-600'
     },
     {
         title: 'Total User',
-        value: 0,
+        value: props.stats?.users || 0,
         subtitle: 'Pengguna aplikasi',
         icon: 'i-lucide-user-check',
         gradient: 'bg-gradient-to-br from-violet-500 to-violet-600'
     }
-];
+]);
 
-// Gender data - Static (empty)
-const genderData = {
-    male: 0,
-    female: 0
-};
+// Gender data - Dynamic from props with fallback
+const genderDataComputed = computed(() => ({
+    male: props.genderData?.male || 0,
+    female: props.genderData?.female || 0
+}));
 
-// Age distribution - Static (empty)
-const totalStudents = 0;
-const ageData = [
-    { 
-        label: '7-12 tahun', 
-        value: 0, 
-        color: 'bg-blue-500',
-        percentage: 0
-    },
-    { 
-        label: '13-15 tahun', 
-        value: 0, 
-        color: 'bg-green-500',
-        percentage: 0
-    },
-    { 
-        label: '16-20 tahun', 
-        value: 0, 
-        color: 'bg-purple-500',
-        percentage: 0
-    }
-];
+// Age distribution - Dynamic from props with fallback
+const ageDataComputed = computed(() => props.ageData || [
+    { label: '7-12 tahun', value: 0, color: 'bg-blue-500', percentage: 0 },
+    { label: '13-15 tahun', value: 0, color: 'bg-green-500', percentage: 0 },
+    { label: '16-20 tahun', value: 0, color: 'bg-purple-500', percentage: 0 }
+]);
+
 
 // Quick Actions
 const quickActions = computed(() => {
@@ -396,11 +399,12 @@ const quickActions = computed(() => {
         { label: 'Berita', icon: 'i-lucide-newspaper', to: '/dashboard/cms/posts' },
         { label: 'Program', icon: 'i-lucide-book-open', to: '/dashboard/cms/programs' },
         { label: 'Web Setting', icon: 'i-lucide-settings', to: '/dashboard/cms/settings' }
-    ];
+    ]
 });
 
-// Recent data - Empty arrays (static)
-const recentPermissions = [];
-const recentViolations = [];
-const boardingSchools = [];
+// Recent data - Dynamic from props with fallback
+const recentPermissionsComputed = computed(() => props.recentPermissions || []);
+const recentViolationsComputed = computed(() => props.recentViolations || []);
+const boardingSchoolsComputed = computed(() => props.boardingSchools || []);
+
 </script>

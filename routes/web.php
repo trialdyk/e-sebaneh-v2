@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminBoardingSchoolController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BoardingSchoolController;
+use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProfileController;
@@ -74,9 +75,7 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('dashboard')->name('dashboard.')->group(function () {
         // Dashboard Home
-        Route::get('/', function () {
-            return Inertia::render('Dashboard/Index', ['posts' => []]);
-        })->name('index');
+        Route::get('/', [DashboardController::class, 'index'])->name('index');
 
         // Profile Routes (All Authenticated Users)
         Route::prefix('profile')->name('profile.')->group(function () {
