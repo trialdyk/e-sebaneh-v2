@@ -41,7 +41,10 @@ class StudentBalanceController extends Controller
             $query->where('rfid', 'like', "%{$request->rfid}%");
         }
 
-        $students = $query->latest()->paginate(15)->withQueryString();
+        $students = $query->latest()->paginate(15)->through(function ($student) {
+            $student->user->is_default_pin = $student->user->pin_atm === '123456';
+            return $student;
+        })->withQueryString();
 
         // Summary
         $totalBalance = User::whereHas('student', function ($q) use ($boardingSchoolId) {

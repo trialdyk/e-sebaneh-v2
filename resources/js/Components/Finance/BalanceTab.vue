@@ -89,7 +89,12 @@
                             size="sm"
                         />
                         <div>
-                            <p class="font-medium text-gray-900 dark:text-gray-100">{{ row.original.user?.name }}</p>
+                            <div class="flex items-center gap-1">
+                                <p class="font-medium text-gray-900 dark:text-gray-100">{{ row.original.user?.name }}</p>
+                                <UTooltip text="Santri ini menggunakan PIN Default (123456)" v-if="row.original.user?.is_default_pin">
+                                    <UIcon name="i-lucide-alert-triangle" class="w-4 h-4 text-amber-500 cursor-help" />
+                                </UTooltip>
+                            </div>
                             <p class="text-sm text-gray-500 dark:text-gray-400">{{ row.original.student_id }}</p>
                         </div>
                     </div>
@@ -268,6 +273,16 @@
                             Santri: <strong>{{ pinModal.student?.user?.name }}</strong>
                         </p>
                     </div>
+
+                    <UAlert
+                        v-if="pinModal.student?.user?.is_default_pin"
+                        color="warning"
+                        variant="subtle"
+                        icon="i-lucide-alert-triangle"
+                        title="PIN Default"
+                        description="Santri ini menggunakan PIN default (123456)."
+                        class="mb-4"
+                    />
 
                     <UFormField label="PIN Baru" required :error="pinForm.errors.pin">
                         <UInput

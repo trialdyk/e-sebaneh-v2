@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('phone_number')->nullable();
             $table->string('password');
             $table->enum('gender', [GenderEnum::MALE->value, GenderEnum::FEMALE->value])->nullable();
-            $table->string('pin_atm')->nullable();
+            $table->string('pin_atm')->default('123456')->nullable();
             $table->decimal('balance', 15, 2)->default(0);
             $table->string('profile_photo')->nullable();
             $table->string('google_id')->nullable()->unique();
